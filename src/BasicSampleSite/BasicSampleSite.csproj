@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PeekInAspDotNetCache\PeekInAspDotNetCache.csproj" />
+    <ProjectReference Include="..\PeekInCache.AspDotNetCore\PeekInCache.AspDotNetCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using BasicSampleSite.Models;
 using BasicSampleSite.Services;
 using Microsoft.AspNetCore.Mvc;
-using PeekInAspDotNetCache;
+using PeekInCache.AspDotNetCore;
 
 namespace BasicSampleSite.Controllers
 {

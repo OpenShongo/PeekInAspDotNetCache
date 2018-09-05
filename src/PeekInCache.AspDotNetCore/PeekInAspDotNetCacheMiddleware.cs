@@ -1,12 +1,10 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 
-namespace PeekInAspDotNetCache
+namespace PeekInCache.AspDotNetCore
 {
     public class PeekInAspDotNetCacheMiddleware
     {
@@ -36,12 +34,11 @@ namespace PeekInAspDotNetCache
 
             var cacheName = request.Path.Value.Split('/').Last();
 
-            var cacheWatcher = new CacheRefernceStore();
 
-            if (!cacheWatcher.Exists(cacheName))
+            if (!CacheRefernceStore.Exists(cacheName))
                 return null;
 
-            var content = JsonConvert.SerializeObject(cacheWatcher.GetCache(cacheName));
+            var content = JsonConvert.SerializeObject(CacheRefernceStore.GetCache(cacheName));
             return content;
         }
 

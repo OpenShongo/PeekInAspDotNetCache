@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PeekInAspDotNetCache;
+using PeekInCache.AspDotNetCore;
 
 namespace BasicSampleSite
 {
@@ -22,7 +22,8 @@ namespace BasicSampleSite
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.ForClassPeekAtCache(typeof(PersonController));
+            //services.PeekInAClass(typeof(PersonController));
+            services.PeekInAllClasses();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
