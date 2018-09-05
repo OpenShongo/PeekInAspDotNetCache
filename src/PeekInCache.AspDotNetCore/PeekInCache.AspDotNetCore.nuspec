@@ -9,6 +9,6 @@
     <description>Diagnostic library to peek into in-memory cache for ASP.Net Core</description>
   </metadata>
   <files>
-    <file src="bin\*.dll" target="bin" />
+    <file src="bin\Release\netstandard2.0\*.dll" target="bin" />
   </files>
 </package>
