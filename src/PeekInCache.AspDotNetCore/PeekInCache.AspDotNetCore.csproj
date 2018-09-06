@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Sebastian Mormah</Authors>
+    <Company>Shongo Ltd</Company>
   </PropertyGroup>
 
   <ItemGroup>
