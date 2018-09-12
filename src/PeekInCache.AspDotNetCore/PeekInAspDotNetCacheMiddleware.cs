@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -38,8 +40,29 @@ namespace PeekInCache.AspDotNetCore
             if (!CacheRefernceStore.Exists(cacheName))
                 return null;
 
-            var content = JsonConvert.SerializeObject(CacheRefernceStore.GetCache(cacheName));
-            return content;
+            var cache = DetermineSerialzableCache(cacheName);
+            return cache != null ? JsonConvert.SerializeObject(cache) : null;
+        }
+
+        private static object DetermineSerialzableCache(string cacheName)
+        {
+            object cache = CacheRefernceStore.GetCache(cacheName);
+            var type = cache.GetType();
+
+            if (type.IsSerializable)
+                return cache;
+
+            if (type.Name.Equals("MemoryCache"))
+                return ExtractSerialzableCacheFromMemoryCache(cache);
+
+            return null;
+        }
+
+        private static object ExtractSerialzableCacheFromMemoryCache(object cache)
+        {
+            if (!(cache is IEnumerable enumerable))
+                return null;
+            return enumerable.Cast<DictionaryEntry>().ToDictionary(entry => entry.Key, entry => entry.Value);
         }
 
 

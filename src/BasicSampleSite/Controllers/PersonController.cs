@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
 using BasicSampleSite.Models;
 using BasicSampleSite.Services;
@@ -11,8 +12,12 @@ namespace BasicSampleSite.Controllers
     [Route("api/person")]
     public class PersonController : Controller
     {
-        [PeekInCache(nameof(PersonCache))]
-        private static readonly Dictionary<string, IEnumerable<Person>> PersonCache = new Dictionary<string, IEnumerable<Person>>();
+        [PeekInCache(nameof(NameCache))]
+        private static readonly Dictionary<string, IEnumerable<Name>> NameCache = new Dictionary<string, IEnumerable<Name>>();
+
+        [PeekInCache(nameof(PersonMemoryCache))]
+        private static readonly MemoryCache PersonMemoryCache = MemoryCache.Default;
+
         private readonly FetchSamplePersonService _personService;
 
         public PersonController()
@@ -30,14 +35,34 @@ namespace BasicSampleSite.Controllers
             return Ok(persons);
         }
 
+        [HttpGet("names/list/{limit}")]
+        [ProducesResponseType(typeof(IEnumerable<Person>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetNameListAsync(int limit)
+        {
+            var key = $"{nameof(GetNameListAsync)}_{limit}";
+            var persons = await GetNames(key, limit);
+
+            return Ok(persons);
+        }
+
+        private async Task<IEnumerable<Name>> GetNames(string key, int limit)
+        {
+            if (NameCache.ContainsKey(key))
+                return NameCache[key];
+
+            var names = await _personService.FetchRandomSampleOfNames(limit);
+            NameCache[key] = names;
+            return NameCache[key];
+        }
+
         private async Task<IEnumerable<Person>> GetPersons(string key, int limit)
         {
-            if (PersonCache.ContainsKey(key))
-                return PersonCache[key];
+            if (PersonMemoryCache.Contains(key))
+                return (IEnumerable<Person>)PersonMemoryCache[key];
 
             var persons = await _personService.FetchRandomSampleOfPersons(limit);
-            PersonCache[key] = persons;
-            return PersonCache[key];
+            PersonMemoryCache[key] = persons;
+            return (IEnumerable<Person>)PersonMemoryCache[key];
         }
     }
 }
