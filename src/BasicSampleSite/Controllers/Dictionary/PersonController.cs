@@ -7,15 +7,13 @@ using BasicSampleSite.Services;
 using Microsoft.AspNetCore.Mvc;
 using PeekInCache.AspDotNetCore;
 
-namespace BasicSampleSite.Controllers
+namespace BasicSampleSite.Controllers.Dictionary
 {
-    [Route("api/person")]
+    [Route("api/dictionary/person")]
+    [Route("api/dict/person")]
     public class PersonController : Controller
     {
-        [PeekInCache(nameof(NameCache))]
-        private static readonly Dictionary<string, IEnumerable<Name>> NameCache = new Dictionary<string, IEnumerable<Name>>();
-
-        [PeekInCache(nameof(PersonMemoryCache))]
+        [PeekInCache("Dict_"+ nameof(PersonMemoryCache))]
         private static readonly MemoryCache PersonMemoryCache = MemoryCache.Default;
 
         private readonly FetchSamplePersonService _personService;
@@ -33,26 +31,6 @@ namespace BasicSampleSite.Controllers
             var persons = await GetPersons(key, limit);
                 
             return Ok(persons);
-        }
-
-        [HttpGet("names/list/{limit}")]
-        [ProducesResponseType(typeof(IEnumerable<Person>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetNameListAsync(int limit)
-        {
-            var key = $"{nameof(GetNameListAsync)}_{limit}";
-            var persons = await GetNames(key, limit);
-
-            return Ok(persons);
-        }
-
-        private async Task<IEnumerable<Name>> GetNames(string key, int limit)
-        {
-            if (NameCache.ContainsKey(key))
-                return NameCache[key];
-
-            var names = await _personService.FetchRandomSampleOfNames(limit);
-            NameCache[key] = names;
-            return NameCache[key];
         }
 
         private async Task<IEnumerable<Person>> GetPersons(string key, int limit)

@@ -4,8 +4,7 @@ namespace PeekInCache.AspDotNetCore
 {
     public sealed class CacheRefernceStore
     {
-        public static Dictionary<string, object> CacheStore = new Dictionary<string, object>();
-
+        private static readonly Dictionary<string, object> CacheStore = new Dictionary<string, object>();
 
         public static void Register(string name, object cache)
         {
@@ -22,6 +21,5 @@ namespace PeekInCache.AspDotNetCore
         {
             return CacheStore.ContainsKey(name.ToUpper());
         }
-
     }
 }

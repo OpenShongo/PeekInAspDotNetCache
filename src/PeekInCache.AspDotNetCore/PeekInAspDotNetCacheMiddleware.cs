@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -55,7 +55,24 @@ namespace PeekInCache.AspDotNetCore
             if (type.Name.Equals("MemoryCache"))
                 return ExtractSerialzableCacheFromMemoryCache(cache);
 
+            if (type.Name.Equals("PlaceholderMemoryCache"))
+                return ExtractSerialzableCacheFromDefaultMemoryCache(cache);
+
             return null;
+        }
+
+        private static object ExtractSerialzableCacheFromDefaultMemoryCache(object placeholder)
+        {
+            if (!(placeholder is PlaceholderMemoryCache))
+                return null;
+            var memoryCacheObject = ServiceCollectionRefernce.GetAspDotNetDefaultMemoryCache();
+
+            var type = memoryCacheObject.GetType();
+            var rawCacheFiledInfo = type.GetField("_entries", BindingFlags.NonPublic |BindingFlags.Instance);
+
+            var cache = rawCacheFiledInfo?.GetValue(memoryCacheObject);
+
+            return cache;
         }
 
         private static object ExtractSerialzableCacheFromMemoryCache(object cache)
