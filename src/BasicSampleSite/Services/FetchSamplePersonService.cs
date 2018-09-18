@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BasicSampleSite.Models;
@@ -10,17 +11,20 @@ namespace BasicSampleSite.Services
     {
         private static readonly HttpClient HttpClient = new HttpClient();
 
-        public async Task<IEnumerable<Person>> FetchRandomSampleOfPersons(int limit)
+        public async Task<IEnumerable<Name>> FetchRandomSampleOfNames(int limit)
         {
-            var personList = new List<Person>();
-
-
             var response = await HttpClient.GetAsync($"https://randomuser.me/api/?results={limit}");
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ResponseResult>(content);
-            personList.AddRange(result.Results);
+            return result.Results.Select(x => x.Name);
+        }
 
-            return personList;
+        public async Task<IEnumerable<Person>> FetchRandomSampleOfPersons(int limit)
+        {
+            var response = await HttpClient.GetAsync($"https://randomuser.me/api/?results={limit}");
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ResponseResult>(content);
+            return result.Results;
         }
     }
 }

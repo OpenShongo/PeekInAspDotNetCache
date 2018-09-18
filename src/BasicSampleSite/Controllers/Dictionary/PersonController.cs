@@ -1,18 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
 using BasicSampleSite.Models;
 using BasicSampleSite.Services;
 using Microsoft.AspNetCore.Mvc;
 using PeekInCache.AspDotNetCore;
 
-namespace BasicSampleSite.Controllers
+namespace BasicSampleSite.Controllers.Dictionary
 {
-    [Route("api/person")]
+    [Route("api/dictionary/person")]
+    [Route("api/dict/person")]
     public class PersonController : Controller
     {
-        [PeekInCache(nameof(PersonCache))]
-        private static readonly Dictionary<string, IEnumerable<Person>> PersonCache = new Dictionary<string, IEnumerable<Person>>();
+        [PeekInCache("Dict_"+ nameof(PersonMemoryCache))]
+        private static readonly MemoryCache PersonMemoryCache = MemoryCache.Default;
+
         private readonly FetchSamplePersonService _personService;
 
         public PersonController()
@@ -32,12 +35,12 @@ namespace BasicSampleSite.Controllers
 
         private async Task<IEnumerable<Person>> GetPersons(string key, int limit)
         {
-            if (PersonCache.ContainsKey(key))
-                return PersonCache[key];
+            if (PersonMemoryCache.Contains(key))
+                return (IEnumerable<Person>)PersonMemoryCache[key];
 
             var persons = await _personService.FetchRandomSampleOfPersons(limit);
-            PersonCache[key] = persons;
-            return PersonCache[key];
+            PersonMemoryCache[key] = persons;
+            return (IEnumerable<Person>)PersonMemoryCache[key];
         }
     }
 }
